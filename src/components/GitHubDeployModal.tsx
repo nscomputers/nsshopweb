@@ -24,8 +24,8 @@ export const GitHubDeployModal: React.FC<GitHubDeployModalProps> = ({
 }) => {
   if (!isOpen) return null;
 
-  const [username, setUsername] = useState('');
-  const [repoName, setRepoName] = useState('ns-computers-store');
+  const [username, setUsername] = useState('nscomputers');
+  const [repoName, setRepoName] = useState('nsshopweb');
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
 
   const cleanUser = username.trim() || 'YOUR_GITHUB_USERNAME';
