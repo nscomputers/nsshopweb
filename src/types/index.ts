@@ -51,7 +51,6 @@ export interface StoreSettings {
   currency: string;
   announcement: string;
   adminUsername: string;
-  adminPasswordHash: string; // or plain text for local validation
 }
 
 export interface FirebaseConfig {

@@ -122,7 +122,6 @@ export const DEFAULT_SETTINGS: {
   currency: string;
   announcement: string;
   adminUsername: string;
-  adminPasswordHash: string;
 } = {
   storeName: 'NS Computers & Electronics',
   tagline: 'Tech Store & Service Hub',
@@ -131,6 +130,5 @@ export const DEFAULT_SETTINGS: {
   address: 'No. 45 Commercial Center, High Level Road, Colombo / Kandy, Sri Lanka',
   currency: '$',
   announcement: 'Islandwide Express Delivery | Call / WhatsApp 0717592590 for Custom PC Builds & Tech Support',
-  adminUsername: 'admin',
-  adminPasswordHash: 'DsL5151#'
+  adminUsername: 'admin'
 };

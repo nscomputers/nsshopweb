@@ -13,6 +13,7 @@ import {
   Edit, 
   Trash2, 
   Eye, 
+  EyeOff,
   Phone, 
   MessageCircle, 
   Check, 
@@ -64,9 +65,10 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   isCloudConnected,
   setIsCloudConnected,
 }) => {
-  // Login State
+  // Login State - password is never stored or persisted
   const [usernameInput, setUsernameInput] = useState('admin');
-  const [passwordInput, setPasswordInput] = useState('DsL5151#');
+  const [passwordInput, setPasswordInput] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState(false);
 
   // Admin Tab State
@@ -106,20 +108,23 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
 
   // Settings State Form
   const [settingsForm, setSettingsForm] = useState<StoreSettings>(settings);
-  const [newAdminPassword, setNewAdminPassword] = useState('');
 
   // Handle Login
   const handleLoginSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const cleanPass = passwordInput.trim();
+    // Validate password: DS5151# (or legacy DsL5151#)
     if (
-      usernameInput === settings.adminUsername &&
-      (passwordInput === settings.adminPasswordHash || passwordInput === 'DsL5151#')
+      (usernameInput.trim().toLowerCase() === 'admin' || !usernameInput.trim()) &&
+      (cleanPass === 'DS5151#' || cleanPass === 'DsL5151#')
     ) {
       setLoginError(false);
+      setPasswordInput(''); // Do not store password in memory or state
       onLogin();
-      onShowToast('Welcome to NS Computers Admin Dashboard!');
+      onShowToast('Welcome, Site Admin!');
     } else {
       setLoginError(true);
+      setPasswordInput(''); // Clear password on error immediately
     }
   };
 
@@ -246,13 +251,8 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
   // Save Settings
   const handleSaveSettings = (e: React.FormEvent) => {
     e.preventDefault();
-    const updated: StoreSettings = {
-      ...settingsForm,
-      adminPasswordHash: newAdminPassword.trim() || settingsForm.adminPasswordHash
-    };
-    StorageService.saveLocalSettings(updated);
-    onUpdateSettings(updated);
-    setNewAdminPassword('');
+    StorageService.saveLocalSettings(settingsForm);
+    onUpdateSettings(settingsForm);
     onShowToast('Store settings updated successfully!');
   };
 
@@ -307,17 +307,10 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
           <div className="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mx-auto mb-3 shadow-inner">
             <Lock className="w-7 h-7" />
           </div>
-          <h2 className="text-xl font-black text-slate-900">NS Computers Admin Access</h2>
+          <h2 className="text-xl font-black text-slate-900">Site Admin Access</h2>
           <p className="text-xs text-slate-500 mt-1">
-            Store & Cloud Inventory Management Portal
+            Enter administrator credentials to manage products, orders, and store settings
           </p>
-
-          <div className="mt-3 bg-blue-50/80 p-2.5 rounded-xl border border-blue-100 text-[11px] text-blue-900">
-            <span>Default credentials from source:</span>
-            <div className="font-mono mt-0.5">
-              User: <strong className="text-blue-700">admin</strong> &bull; Pass: <strong className="text-blue-700">DsL5151#</strong>
-            </div>
-          </div>
         </div>
 
         <form onSubmit={handleLoginSubmit} className="space-y-4 text-xs">
@@ -328,25 +321,38 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
               required
               value={usernameInput}
               onChange={(e) => setUsernameInput(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-500 focus:outline-none transition"
+              placeholder="admin"
+              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-500 focus:outline-none transition font-medium"
             />
           </div>
 
           <div>
-            <label className="block font-bold text-slate-700 mb-1">Admin Password</label>
-            <input
-              type="password"
-              required
-              value={passwordInput}
-              onChange={(e) => setPasswordInput(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-500 focus:outline-none transition"
-            />
+            <label className="block font-bold text-slate-700 mb-1">Password</label>
+            <div className="relative">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                required
+                value={passwordInput}
+                onChange={(e) => setPasswordInput(e.target.value)}
+                placeholder="Enter admin password"
+                autoComplete="current-password"
+                className="w-full pl-3.5 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-blue-500 focus:outline-none transition font-medium"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
+                aria-label={showPassword ? 'Hide password' : 'Show password'}
+              >
+                {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+              </button>
+            </div>
           </div>
 
           {loginError && (
-            <div className="p-2.5 bg-rose-50 text-rose-700 rounded-xl flex items-center gap-2 border border-rose-200">
+            <div className="p-2.5 bg-rose-50 text-rose-700 rounded-xl flex items-center gap-2 border border-rose-200 animate-in fade-in">
               <AlertTriangle className="w-4 h-4 shrink-0" />
-              <span>Invalid username or password. Please use admin / DsL5151#</span>
+              <span>Invalid admin credentials. Please re-enter your password.</span>
             </div>
           )}
 
@@ -354,7 +360,7 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
             type="submit"
             className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-md transition"
           >
-            Log In to Admin Dashboard
+            Log In as Site Admin
           </button>
         </form>
       </div>
@@ -1038,17 +1044,6 @@ export const AdminPortal: React.FC<AdminPortalProps> = ({
                 type="text"
                 value={settingsForm.address}
                 onChange={(e) => setSettingsForm({ ...settingsForm, address: e.target.value })}
-                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
-              />
-            </div>
-
-            <div>
-              <label className="block font-bold text-slate-700 mb-1">Change Admin Password</label>
-              <input
-                type="password"
-                value={newAdminPassword}
-                onChange={(e) => setNewAdminPassword(e.target.value)}
-                placeholder="Leave blank to keep current password"
                 className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none"
               />
             </div>

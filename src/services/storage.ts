@@ -82,7 +82,10 @@ export class StorageService {
     try {
       const data = localStorage.getItem(STORAGE_KEYS.SETTINGS);
       if (data) {
-        return { ...DEFAULT_SETTINGS, ...JSON.parse(data) };
+        const parsed = JSON.parse(data);
+        delete (parsed as any).adminPasswordHash;
+        delete (parsed as any).password;
+        return { ...DEFAULT_SETTINGS, ...parsed };
       }
     } catch (e) {
       console.warn('Error reading settings from localStorage:', e);
@@ -92,7 +95,10 @@ export class StorageService {
 
   static saveLocalSettings(settings: StoreSettings): void {
     try {
-      localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+      const safeSettings = { ...settings };
+      delete (safeSettings as any).adminPasswordHash;
+      delete (safeSettings as any).password;
+      localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(safeSettings));
       window.dispatchEvent(new Event('ns_settings_updated'));
     } catch (e) {
       console.error('Error saving settings:', e);

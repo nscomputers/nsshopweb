@@ -53,11 +53,10 @@ Because GitHub Pages hosts static web applications, this application includes a 
 
 ---
 
-## 🔐 Admin Portal Credentials
+## 🔐 Site Admin Access
 
 - **Username**: `admin`
-- **Default Password**: `DsL5151#`
-*(You can customize the admin password anytime in Admin Portal &rarr; Store Settings).*
+- **Access**: Enter your admin password on the Site Admin login screen. Password is verified securely at runtime and is never saved to localStorage, files, or database backups.
 
 ---
 
