@@ -1,0 +1,6 @@
+{
+  "name": "NS Computers & Electronics - Store & Cloud Admin",
+  "description": "Official e-commerce storefront and admin management portal for NS Computers And Electronics with persistent cloud & offline data storage and GitHub Pages deployment support.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

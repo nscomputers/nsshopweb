@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NS Computers And Electronics - Store & Admin</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        @media print {
+            body * { visibility: hidden; }
+            #printable-invoice, #printable-invoice * { visibility: visible; }
+            #printable-invoice { position: absolute; left: 0; top: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body class="bg-gray-50 text-gray-800 min-h-screen flex flex-col justify-between">
+
+    <!-- TOP ANNOUNCEMENT / BAR -->
+    <div class="bg-slate-900 text-slate-300 text-xs py-2 px-4">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <span><i class="fa-solid fa-phone text-blue-400 mr-1.5"></i> Call / WhatsApp: <a href="tel:0717592590" class="font-semibold text-white hover:underline">0717592590</a></span>
+                <span class="hidden sm:inline-block text-slate-500">|</span>
+                <span class="hidden sm:inline-block"><i class="fa-solid fa-truck-fast text-blue-400 mr-1.5"></i> Islandwide Delivery Available</span>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="switchView('store')" id="nav-btn-store" class="text-blue-400 font-medium hover:underline">
+                    <i class="fa-solid fa-store mr-1"></i> Storefront
+                </button>
+                <span class="text-slate-600">|</span>
+                <button onclick="switchView('admin')" id="nav-btn-admin" class="hover:text-white transition">
+                    <i class="fa-solid fa-user-shield mr-1"></i> Admin Portal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN NAVBAR -->
+    <header class="bg-white border-b border-gray-200 sticky top-0 z-30 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <!-- Brand Logo / Name -->
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="switchView('store')">
+                <div class="w-10 h-10 rounded-lg bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-bold text-xl shadow-md">
+                    <i class="fa-solid fa-laptop-code"></i>
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-bold tracking-tight text-gray-900 leading-tight">
+                        NS <span class="text-blue-600">Computers</span> & Electronics
+                    </h1>
+                    <p class="text-[11px] text-gray-500 font-medium">Tech Store & Service Hub</p>
+                </div>
+            </div>
+
+            <!-- Search Bar (Store view only) -->
+            <div id="nav-search-container" class="hidden md:flex items-center flex-1 max-w-md mx-8">
+                <div class="relative w-full">
+                    <input type="text" id="global-search" oninput="handleSearch()" placeholder="Search laptops, accessories, components..." class="w-full pl-10 pr-4 py-2 text-sm bg-gray-100 border border-transparent rounded-full focus:bg-white focus:border-blue-500 focus:outline-none transition">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-2.5 text-gray-400 text-sm"></i>
+                </div>
+            </div>
+
+            <!-- Right Controls -->
+            <div class="flex items-center space-x-3">
+                <div id="store-controls" class="flex items-center space-x-3">
+                    <button onclick="toggleCartDrawer(true)" class="relative p-2.5 text-gray-700 hover:text-blue-600 transition rounded-full hover:bg-gray-100">
+                        <i class="fa-solid fa-cart-shopping text-lg"></i>
+                        <span id="cart-badge" class="absolute -top-1 -right-1 bg-blue-600 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
+                    </button>
+                </div>
+                <div id="admin-controls" class="hidden flex items-center space-x-2">
+                    <span id="admin-user-badge" class="text-xs bg-indigo-50 text-indigo-700 px-2.5 py-1 rounded-md font-medium border border-indigo-200">
+                        <i class="fa-solid fa-shield-halved mr-1"></i> Admin Mode
+                    </span>
+                    <button onclick="adminLogout()" class="text-xs text-red-600 hover:text-red-800 font-medium px-2 py-1">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN VIEW CONTAINER -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex-grow w-full">
+        
+        <!-- STOREFRONT VIEW -->
+        <section id="view-store" class="block">
+            <!-- Mobile Search -->
+            <div class="md:hidden mb-4">
+                <div class="relative w-full">
+                    <input type="text" id="mobile-search" oninput="handleMobileSearch()" placeholder="Search products..." class="w-full pl-10 pr-4 py-2 text-sm bg-white border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-gray-400 text-sm"></i>
+                </div>
+            </div>
+
+            <!-- Store Banner -->
+            <div class="relative bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-900 rounded-2xl p-6 sm:p-10 mb-8 text-white overflow-hidden shadow-xl">
+                <div class="relative z-10 max-w-xl">
+                    <span class="inline-block px-3 py-1 bg-blue-500/20 text-blue-300 text-xs font-semibold rounded-full mb-3 border border-blue-400/30">Official Store</span>
+                    <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight mb-2">High Performance Hardware & Electronics</h2>
+                    <p class="text-slate-300 text-sm sm:text-base mb-6">Upgrade your setup with premium laptops, custom gaming rigs, accessories, and genuine computer components.</p>
+                    <div class="flex flex-wrap items-center gap-3">
+                        <a href="tel:0717592590" class="inline-flex items-center justify-center px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-lg shadow-md transition">
+                            <i class="fa-solid fa-phone mr-2"></i> Call 0717592590
+                        </a>
+                        <button onclick="scrollToProducts()" class="inline-flex items-center justify-center px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white font-medium text-sm rounded-lg backdrop-blur-sm transition">
+                            Explore Products
+                        </button>
+                    </div>
+                </div>
+                <div class="absolute right-0 bottom-0 top-0 w-1/3 opacity-15 pointer-events-none hidden md:flex items-center justify-center">
+                    <i class="fa-solid fa-microchip text-[180px]"></i>
+                </div>
+            </div>
+
+            <!-- Main Catalog Section -->
+            <div id="catalog-section" class="grid grid-cols-1 lg:grid-cols-4 gap-8">
+                <!-- Filters Sidebar -->
+                <aside class="space-y-6">
+                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-gray-900 flex items-center">
+                                <i class="fa-solid fa-filter text-blue-600 mr-2 text-sm"></i> Filters
+                            </h3>
+                            <button onclick="resetFilters()" class="text-xs text-blue-600 hover:underline">Reset All</button>
+                        </div>
+
+                        <!-- Category Filter -->
+                        <div class="mb-6">
+                            <label class="block text-xs font-semibold uppercase text-gray-500 tracking-wider mb-2">Category</label>
+                            <div class="space-y-1.5" id="category-filter-options">
+                                <!-- Dynamic Categories -->
+                            </div>
+                        </div>
+
+                        <!-- Price Range Filter -->
+                        <div>
+                            <div class="flex justify-between items-center mb-2">
+                                <label class="text-xs font-semibold uppercase text-gray-500 tracking-wider">Max Price</label>
+                                <span id="price-limit-val" class="text-sm font-bold text-gray-900">$2000</span>
+                            </div>
+                            <input type="range" id="price-slider" min="0" max="3000" step="25" value="3000" oninput="handlePriceSlider(this.value)" class="w-full accent-blue-600">
+                            <div class="flex justify-between text-xs text-gray-400 mt-1">
+                                <span>$0</span>
+                                <span>$3,000</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Contact Card -->
+                    <div class="bg-blue-50 border border-blue-100 p-5 rounded-xl text-center">
+                        <div class="w-10 h-10 bg-blue-600 text-white rounded-full flex items-center justify-center mx-auto mb-3">
+                            <i class="fa-solid fa-headset"></i>
+                        </div>
+                        <h4 class="font-bold text-blue-950 text-sm">Need Custom Quotes?</h4>
+                        <p class="text-xs text-slate-600 mt-1 mb-3">Talk directly with NS Computers experts for bulk orders & PC builds.</p>
+                        <a href="tel:0717592590" class="block w-full py-2 bg-blue-600 text-white text-xs font-bold rounded-lg shadow hover:bg-blue-700 transition">
+                            0717592590
+                        </a>
+                    </div>
+                </aside>
+
+                <!-- Product Grid Area -->
+                <div class="lg:col-span-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-2">
+                        <p class="text-sm text-gray-500"><span id="product-count" class="font-bold text-gray-800">0</span> items found</p>
+                        <div class="flex items-center space-x-2">
+                            <label for="sort-select" class="text-xs text-gray-500">Sort by:</label>
+                            <select id="sort-select" onchange="renderProducts()" class="text-xs bg-white border border-gray-300 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-blue-500">
+                                <option value="featured">Featured</option>
+                                <option value="price-low">Price: Low to High</option>
+                                <option value="price-high">Price: High to Low</option>
+                                <option value="name">Name (A-Z)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- Product Cards Container -->
+                    <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Dynamic Products Inserted Here -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ADMIN PORTAL VIEW -->
+        <section id="view-admin" class="hidden">
+            <!-- Login Form (If not authenticated) -->
+            <div id="admin-login-card" class="max-w-md mx-auto my-12 bg-white p-8 rounded-2xl border border-gray-200 shadow-xl">
+                <div class="text-center mb-6">
+                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3 text-xl">
+                        <i class="fa-solid fa-lock"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-gray-900">NS Computers Admin Access</h2>
+                    <p class="text-xs text-gray-500 mt-1">Default credentials: Username: <code class="text-blue-600">admin</code> | Password: <code class="text-blue-600">*</code></p>
+                </div>
+                <form onsubmit="handleAdminLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Username</label>
+                        <input type="text" id="login-username" required value="admin" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Password</label>
+                        <input type="password" id="login-password" required value="" class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div id="login-error" class="text-xs text-red-600 hidden">Invalid username or password.</div>
+                    <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-medium text-sm rounded-lg transition shadow">
+                        Login to Dashboard
+                    </button>
+                </form>
+            </div>
+
+            <!-- Admin Main Dashboard Content -->
+            <div id="admin-dashboard" class="hidden space-y-6">
+                <!-- Dashboard Header Banner -->
+                <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h2 class="text-2xl font-bold text-gray-900">NS Computers & Electronics Dashboard</h2>
+                        <p class="text-xs text-gray-500 mt-1">Store Helpline: <span class="font-semibold text-gray-800">0717592590</span> | System Operational</p>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button onclick="switchAdminTab('inventory')" id="tab-btn-inventory" class="px-4 py-2 text-xs font-semibold rounded-lg bg-blue-600 text-white shadow">
+                            <i class="fa-solid fa-boxes-stacked mr-1.5"></i> Inventory Management
+                        </button>
+                        <button onclick="switchAdminTab('orders')" id="tab-btn-orders" class="px-4 py-2 text-xs font-semibold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200">
+                            <i class="fa-solid fa-receipt mr-1.5"></i> Customer Orders
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Metrics Overview -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                        <p class="text-xs font-semibold uppercase text-gray-400">Total Revenue</p>
+                        <p id="metric-revenue" class="text-2xl font-bold text-gray-900 mt-1">$0.00</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                        <p class="text-xs font-semibold uppercase text-gray-400">Total Orders</p>
+                        <p id="metric-orders" class="text-2xl font-bold text-gray-900 mt-1">0</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                        <p class="text-xs font-semibold uppercase text-gray-400">Total Products</p>
+                        <p id="metric-products" class="text-2xl font-bold text-gray-900 mt-1">0</p>
+                    </div>
+                    <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                        <p class="text-xs font-semibold uppercase text-gray-400">Low Stock Alerts</p>
+                        <p id="metric-lowstock" class="text-2xl font-bold text-amber-600 mt-1">0</p>
+                    </div>
+                </div>
+
+                <!-- TAB 1: PRODUCT INVENTORY -->
+                <div id="admin-tab-inventory" class="space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <h3 class="text-lg font-bold text-gray-900">Product Inventory</h3>
+                            <div class="flex flex-wrap items-center gap-2">
+                                <button onclick="openProductModal()" class="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-semibold rounded-lg shadow transition">
+                                    <i class="fa-solid fa-plus mr-1"></i> Add Product
+                                </button>
+                                <button onclick="exportProducts('json')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition">
+                                    <i class="fa-solid fa-file-code mr-1"></i> Export JSON
+                                </button>
+                                <button onclick="exportProducts('csv')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition">
+                                    <i class="fa-solid fa-file-csv mr-1"></i> Export CSV
+                                </button>
+                                <label class="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200 text-xs font-semibold rounded-lg cursor-pointer transition">
+                                    <i class="fa-solid fa-file-import mr-1"></i> Import Products
+                                    <input type="file" accept=".json,.csv" onchange="importProducts(event)" class="hidden">
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Products Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-gray-50 border-y border-gray-200 text-gray-500 uppercase font-semibold">
+                                        <th class="py-3 px-4">Product</th>
+                                        <th class="py-3 px-4">Category</th>
+                                        <th class="py-3 px-4">Price</th>
+                                        <th class="py-3 px-4">Stock</th>
+                                        <th class="py-3 px-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-products-table" class="divide-y divide-gray-100">
+                                    <!-- Dynamic Inventory Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: CUSTOMER ORDERS -->
+                <div id="admin-tab-orders" class="hidden space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border border-gray-200 shadow-sm space-y-4">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                            <h3 class="text-lg font-bold text-gray-900">Customer Orders</h3>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="exportOrders('json')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition">
+                                    <i class="fa-solid fa-file-code mr-1"></i> Export JSON
+                                </button>
+                                <button onclick="exportOrders('csv')" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition">
+                                    <i class="fa-solid fa-file-csv mr-1"></i> Export CSV
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Orders Table -->
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-left border-collapse text-xs">
+                                <thead>
+                                    <tr class="bg-gray-50 border-y border-gray-200 text-gray-500 uppercase font-semibold">
+                                        <th class="py-3 px-4">Order ID</th>
+                                        <th class="py-3 px-4">Customer</th>
+                                        <th class="py-3 px-4">Total</th>
+                                        <th class="py-3 px-4">Payment</th>
+                                        <th class="py-3 px-4">Status</th>
+                                        <th class="py-3 px-4 text-right">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="admin-orders-table" class="divide-y divide-gray-100">
+                                    <!-- Dynamic Order Rows -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="bg-slate-900 text-slate-400 text-xs border-t border-slate-800 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+                <h3 class="text-white font-bold text-sm mb-2">NS Computers And Electronics</h3>
+                <p class="leading-relaxed mb-3">Your trusted computer store for high performance laptops, peripherals, parts, and hardware accessories.</p>
+                <p class="text-slate-300 font-semibold"><i class="fa-solid fa-phone text-blue-400 mr-2"></i> 0717592590</p>
+            </div>
+            <div>
+                <h4 class="text-white font-semibold mb-2">Popular Categories</h4>
+                <ul class="space-y-1">
+                    <li><a href="#" onclick="filterCategory('Laptops')" class="hover:text-white transition">Laptops & Notebooks</a></li>
+                    <li><a href="#" onclick="filterCategory('Monitors')" class="hover:text-white transition">High-Refresh Monitors</a></li>
+                    <li><a href="#" onclick="filterCategory('Gaming Peripherals')" class="hover:text-white transition">Gaming Peripherals</a></li>
+                    <li><a href="#" onclick="filterCategory('Components')" class="hover:text-white transition">Computer Components</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-white font-semibold mb-2">Customer Service</h4>
+                <p class="leading-relaxed mb-2">Need tech support or stock verification? Reach out directly via call or WhatsApp.</p>
+                <a href="tel:0717592590" class="inline-block px-3 py-1.5 bg-blue-600 text-white rounded font-medium hover:bg-blue-700 transition">Contact Store</a>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pt-4 border-t border-slate-800 text-center text-slate-500">
+            &copy; <span id="year"></span> NS Computers And Electronics. All Rights Reserved.
+        </div>
+    </footer>
+
+    <!-- CART SLIDE-OVER DRAWER -->
+    <div id="cart-drawer" class="fixed inset-0 z-50 overflow-hidden hidden" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+        <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm transition-opacity" onclick="toggleCartDrawer(false)"></div>
+        <div class="fixed inset-y-0 right-0 pl-10 max-w-full flex">
+            <div class="w-screen max-w-md bg-white shadow-2xl flex flex-col">
+                <div class="p-4 border-b border-gray-200 flex items-center justify-between">
+                    <h2 class="text-base font-bold text-gray-900 flex items-center">
+                        <i class="fa-solid fa-cart-shopping mr-2 text-blue-600"></i> Your Cart
+                    </h2>
+                    <button onclick="toggleCartDrawer(false)" class="p-1 text-gray-400 hover:text-gray-600">
+                        <i class="fa-solid fa-xmark text-lg"></i>
+                    </button>
+                </div>
+                <div id="cart-items-list" class="flex-1 overflow-y-auto p-4 space-y-4">
+                    <!-- Dynamic Cart Items -->
+                </div>
+                <div class="p-4 border-t border-gray-200 bg-gray-50 space-y-3">
+                    <div class="flex justify-between text-sm font-bold text-gray-900">
+                        <span>Total:</span>
+                        <span id="cart-total-price">$0.00</span>
+                    </div>
+                    <button onclick="openCheckoutModal()" id="btn-proceed-checkout" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-lg transition shadow">
+                        Proceed to Checkout
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CHECKOUT MODAL -->
+    <div id="checkout-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 hidden">
+        <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <div>
+                    <h3 class="font-bold text-gray-900 text-lg">Complete Your Order</h3>
+                    <p class="text-xs text-gray-500">NS Computers And Electronics - Contact: 0717592590</p>
+                </div>
+                <button onclick="closeCheckoutModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="handleCheckoutSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Full Name *</label>
+                    <input type="text" id="cust-name" required class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-blue-500" placeholder="John Doe">
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Phone Number *</label>
+                        <input type="tel" id="cust-phone" required class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-blue-500" placeholder="0712345678">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-700 mb-1">Email Address *</label>
+                        <input type="email" id="cust-email" required class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-blue-500" placeholder="john@example.com">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Delivery Address *</label>
+                    <textarea id="cust-address" required rows="2" class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-blue-500" placeholder="Street Address, City"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-gray-700 mb-1">Payment Method</label>
+                    <select id="cust-payment" class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-blue-500">
+                        <option value="Cash on Delivery">Cash on Delivery (COD)</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="Card Payment at Store">Card Payment at Store</option>
+                    </select>
+                </div>
+                <div class="bg-gray-50 p-3 rounded-lg border text-xs text-gray-600 space-y-1">
+                    <div class="flex justify-between font-bold text-gray-800">
+                        <span>Order Total:</span>
+                        <span id="checkout-total-val">$0.00</span>
+                    </div>
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-sm rounded-lg shadow transition">
+                    Confirm & Place Order
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- PRODUCT CRUD MODAL (ADMIN) -->
+    <div id="product-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 id="product-modal-title" class="font-bold text-gray-900 text-lg">Add Product</h3>
+                <button onclick="closeProductModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+            </div>
+            <form onsubmit="handleProductFormSubmit(event)" class="space-y-3 text-xs">
+                <input type="hidden" id="prod-id">
+                <div>
+                    <label class="block font-semibold text-gray-700 mb-1">Product Name</label>
+                    <input type="text" id="prod-name" required class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-blue-500">
+                </div>
+                <div>
+                    <label class="block font-semibold text-gray-700 mb-1">Category</label>
+                    <input type="text" id="prod-category" required list="category-list" class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-blue-500" placeholder="e.g. Laptops">
+                    <datalist id="category-list">
+                        <option value="Laptops">
+                        <option value="Monitors">
+                        <option value="Gaming Peripherals">
+                        <option value="Components">
+                        <option value="Accessories">
+                    </datalist>
+                </div>
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Price ($)</label>
+                        <input type="number" id="prod-price" min="0" step="0.01" required class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-blue-500">
+                    </div>
+                    <div>
+                        <label class="block font-semibold text-gray-700 mb-1">Stock Quantity</label>
+                        <input type="number" id="prod-stock" min="0" required class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-blue-500">
+                    </div>
+                </div>
+                <div>
+                    <label class="block font-semibold text-gray-700 mb-1">Image URL</label>
+                    <input type="url" id="prod-image" required class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-blue-500" placeholder="https://images.unsplash.com/...">
+                </div>
+                <div>
+                    <label class="block font-semibold text-gray-700 mb-1">Description</label>
+                    <textarea id="prod-description" rows="2" class="w-full px-3 py-2 border rounded-lg text-sm focus:outline-none focus:border-blue-500"></textarea>
+                </div>
+                <button type="submit" class="w-full py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-lg shadow transition">
+                    Save Product
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ORDER DETAILS / PRINTABLE INVOICE MODAL -->
+    <div id="order-details-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 hidden">
+        <div class="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-4 border-b pb-3">
+                <h3 class="font-bold text-gray-900 text-lg">Order Details & Invoice</h3>
+                <div class="flex items-center space-x-2">
+                    <button onclick="window.print()" class="px-3 py-1 bg-slate-800 text-white text-xs font-semibold rounded hover:bg-slate-700 transition">
+                        <i class="fa-solid fa-print mr-1"></i> Print
+                    </button>
+                    <button onclick="closeOrderModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark text-lg"></i></button>
+                </div>
+            </div>
+
+            <div id="printable-invoice" class="p-4 border rounded-xl bg-white space-y-4">
+                <!-- Header -->
+                <div class="flex justify-between items-start border-b pb-4">
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900">NS Computers And Electronics</h2>
+                        <p class="text-xs text-slate-600">Helpline / WhatsApp: 0717592590</p>
+                        <p class="text-xs text-slate-500">Premier Computer & Hardware Retailer</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="inline-block px-2.5 py-1 bg-blue-50 text-blue-700 font-bold text-xs rounded border border-blue-200" id="inv-order-id">#ORD-0000</span>
+                        <p class="text-xs text-slate-500 mt-1" id="inv-order-date">Date: N/A</p>
+                    </div>
+                </div>
+
+                <!-- Customer Details -->
+                <div class="grid grid-cols-2 gap-4 text-xs bg-slate-50 p-3 rounded-lg border">
+                    <div>
+                        <p class="font-semibold text-slate-700 uppercase">Customer Information:</p>
+                        <p id="inv-cust-name" class="font-medium text-slate-900"></p>
+                        <p id="inv-cust-phone" class="text-slate-600"></p>
+                        <p id="inv-cust-email" class="text-slate-600"></p>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-slate-700 uppercase">Shipping & Payment:</p>
+                        <p id="inv-cust-address" class="text-slate-600"></p>
+                        <p id="inv-payment-method" class="font-medium text-slate-800 mt-1"></p>
+                    </div>
+                </div>
+
+                <!-- Product Items Table -->
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="border-b font-semibold text-slate-600">
+                            <th class="py-2">Item</th>
+                            <th class="py-2 text-center">Qty</th>
+                            <th class="py-2 text-right">Price</th>
+                            <th class="py-2 text-right">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody id="inv-items-table" class="divide-y">
+                        <!-- Dynamic Invoice Items -->
+                    </tbody>
+                </table>
+
+                <div class="flex justify-between items-center pt-3 border-t text-sm font-bold">
+                    <span>Grand Total:</span>
+                    <span id="inv-total-amount" class="text-blue-600">$0.00</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION TOAST -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 text-white text-xs px-4 py-3 rounded-lg shadow-xl flex items-center space-x-2 transform translate-y-20 opacity-0 transition-all duration-300 z-50">
+        <i id="toast-icon" class="fa-solid fa-circle-check text-emerald-400"></i>
+        <span id="toast-message">Notification message</span>
+    </div>
+
+    <!-- JAVASCRIPT LOGIC persistent with LocalStorage -->
+    <script>
+        // Seed Products for NS Computers And Electronics
+        const DEFAULT_PRODUCTS = [
+            {
+                id: 'prod-1',
+                name: 'ASUS ROG Strix Gaming Laptop',
+                category: 'Laptops',
+                price: 1399.99,
+                stock: 8,
+                image: 'https://images.unsplash.com/photo-1603302576837-37561b2e2302?auto=format&fit=crop&w=600&q=80',
+                description: 'Intel i7 13th Gen, RTX 4060 8GB, 16GB DDR5 RAM, 1TB NVMe SSD, 144Hz FHD Display.'
+            },
+            {
+                id: 'prod-2',
+                name: 'Dell XPS 15 Workstation Laptop',
+                category: 'Laptops',
+                price: 1599.00,
+                stock: 5,
+                image: 'https://images.unsplash.com/photo-1593642632823-8f785ba67e45?auto=format&fit=crop&w=600&q=80',
+                description: 'OLED 4K Display, Intel i9, 32GB RAM, 1TB SSD, sleek aluminum design for creators.'
+            },
+            {
+                id: 'prod-3',
+                name: 'Samsung Odyssey 27" Curved Monitor',
+                category: 'Monitors',
+                price: 299.50,
+                stock: 12,
+                image: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&w=600&q=80',
+                description: '165Hz Refresh Rate, 1ms Response Time, 1440p QHD Resolution with FreeSync.'
+            },
+            {
+                id: 'prod-4',
+                name: 'Logitech G PRO X Mechanical Keyboard',
+                category: 'Gaming Peripherals',
+                price: 129.99,
+                stock: 20,
+                image: 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=600&q=80',
+                description: 'RGB Backlit, Hot-Swappable GX Blue Switches, Compact Tenkeyless design.'
+            },
+            {
+                id: 'prod-5',
+                name: 'Razer DeathAdder V3 Wireless Mouse',
+                category: 'Gaming Peripherals',
+                price: 89.00,
+                stock: 15,
+                image: 'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?auto=format&fit=crop&w=600&q=80',
+                description: 'Ultra-lightweight 63g, 30K DPI Optical Sensor, 90-hour battery life.'
+            },
+            {
+                id: 'prod-6',
+                name: 'NVIDIA GeForce RTX 4070 Ti Super',
+                category: 'Components',
+                price: 799.99,
+                stock: 3,
+                image: 'https://images.unsplash.com/photo-1587202372775-e229f172b9d7?auto=format&fit=crop&w=600&q=80',
+                description: '16GB GDDR6X, DLSS 3.5, Ray Tracing, Triple Fan Cooling System.'
+            },
+            {
+                id: 'prod-7',
+                name: 'HyperX Cloud II Wireless Headset',
+                category: 'Gaming Peripherals',
+                price: 119.50,
+                stock: 9,
+                image: 'https://images.unsplash.com/photo-1546435770-a3e426bf472b?auto=format&fit=crop&w=600&q=80',
+                description: '7.1 Virtual Surround Sound, Memory Foam Earcups, 30-Hour Battery Life.'
+            },
+            {
+                id: 'prod-8',
+                name: 'Anker USB-C Multi-Port Adapter Hub',
+                category: 'Accessories',
+                price: 45.00,
+                stock: 25,
+                image: 'https://images.unsplash.com/photo-1625842268584-8f3296236761?auto=format&fit=crop&w=600&q=80',
+                description: '7-in-1 Dual 4K HDMI, 100W Power Delivery, SD Card Reader, USB 3.0 Ports.'
+            }
+        ];
+
+        // State Management
+        let products = [];
+        let orders = [];
+        let cart = [];
+        let currentCategory = 'All';
+        let maxPrice = 3000;
+        let searchQuery = '';
+        let isAdminLoggedIn = false;
+
+        // Initialize App
+        window.onload = function() {
+            document.getElementById('year').textContent = new Date().getFullYear();
+            loadLocalStorageData();
+            renderCategoryFilters();
+            renderProducts();
+            updateCartUI();
+        };
+
+        // Local Storage Handling
+        function loadLocalStorageData() {
+            const storedProducts = localStorage.getItem('store_products');
+            if (storedProducts) {
+                products = JSON.parse(storedProducts);
+            } else {
+                products = [...DEFAULT_PRODUCTS];
+                saveProductsToStorage();
+            }
+
+            const storedOrders = localStorage.getItem('store_orders');
+            orders = storedOrders ? JSON.parse(storedOrders) : [];
+        }
+
+        function saveProductsToStorage() {
+            localStorage.setItem('store_products', JSON.stringify(products));
+        }
+
+        function saveOrdersToStorage() {
+            localStorage.setItem('store_orders', JSON.stringify(orders));
+        }
+
+        // Navigation
+        function switchView(view) {
+            if (view === 'store') {
+                document.getElementById('view-store').classList.remove('hidden');
+                document.getElementById('view-admin').classList.add('hidden');
+                document.getElementById('nav-search-container').classList.remove('hidden');
+            } else {
+                document.getElementById('view-store').classList.add('hidden');
+                document.getElementById('view-admin').classList.remove('hidden');
+                document.getElementById('nav-search-container').classList.add('hidden');
+                if (isAdminLoggedIn) {
+                    renderAdminDashboard();
+                }
+            }
+        }
+
+        function scrollToProducts() {
+            document.getElementById('catalog-section').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Render Category Filter Sidebar
+        function renderCategoryFilters() {
+            const categories = ['All', ...new Set(products.map(p => p.category))];
+            const container = document.getElementById('category-filter-options');
+            container.innerHTML = categories.map(cat => `
+                <button onclick="filterCategory('${cat}')" class="w-full text-left px-3 py-1.5 rounded-lg text-xs font-medium transition ${currentCategory === cat ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-100'}">
+                    ${cat}
+                </button>
+            `).join('');
+        }
+
+        function filterCategory(cat) {
+            currentCategory = cat;
+            renderCategoryFilters();
+            renderProducts();
+        }
+
+        function handlePriceSlider(val) {
+            maxPrice = parseFloat(val);
+            document.getElementById('price-limit-val').textContent = `$${maxPrice}`;
+            renderProducts();
+        }
+
+        function handleSearch() {
+            searchQuery = document.getElementById('global-search').value.toLowerCase();
+            renderProducts();
+        }
+
+        function handleMobileSearch() {
+            searchQuery = document.getElementById('mobile-search').value.toLowerCase();
+            renderProducts();
+        }
+
+        function resetFilters() {
+            currentCategory = 'All';
+            maxPrice = 3000;
+            searchQuery = '';
+            document.getElementById('price-slider').value = 3000;
+            document.getElementById('price-limit-val').textContent = '$3000';
+            document.getElementById('global-search').value = '';
+            document.getElementById('mobile-search').value = '';
+            renderCategoryFilters();
+            renderProducts();
+        }
+
+        // Render Store Products
+        function renderProducts() {
+            let filtered = products.filter(p => {
+                const matchCat = currentCategory === 'All' || p.category === currentCategory;
+                const matchPrice = p.price <= maxPrice;
+                const matchSearch = p.name.toLowerCase().includes(searchQuery) || p.description.toLowerCase().includes(searchQuery);
+                return matchCat && matchPrice && matchSearch;
+            });
+
+            const sortVal = document.getElementById('sort-select').value;
+            if (sortVal === 'price-low') filtered.sort((a,b) => a.price - b.price);
+            if (sortVal === 'price-high') filtered.sort((a,b) => b.price - a.price);
+            if (sortVal === 'name') filtered.sort((a,b) => a.name.localeCompare(b.name));
+
+            document.getElementById('product-count').textContent = filtered.length;
+            const grid = document.getElementById('product-grid');
+
+            if (filtered.length === 0) {
+                grid.innerHTML = `
+                    <div class="col-span-full py-12 text-center text-gray-400">
+                        <i class="fa-solid fa-box-open text-4xl mb-3"></i>
+                        <p class="text-sm">No electronics match your query.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = filtered.map(p => `
+                <div class="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition flex flex-col justify-between">
+                    <div>
+                        <div class="relative h-44 bg-gray-100 overflow-hidden">
+                            <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover hover:scale-105 transition duration-300" onerror="this.src='https://placehold.co/600x400/e2e8f0/1e293b?text=NS+Electronics'">
+                            <span class="absolute top-2 left-2 bg-slate-900/80 text-white text-[10px] font-semibold px-2 py-0.5 rounded backdrop-blur-sm">
+                                ${p.category}
+                            </span>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="font-bold text-gray-900 text-sm line-clamp-1">${p.name}</h3>
+                            <p class="text-gray-500 text-xs mt-1 line-clamp-2">${p.description}</p>
+                        </div>
+                    </div>
+                    <div class="p-4 pt-0">
+                        <div class="flex items-center justify-between mb-3">
+                            <span class="text-lg font-extrabold text-gray-900">$${p.price.toFixed(2)}</span>
+                            <span class="text-[11px] font-medium ${p.stock > 0 ? 'text-emerald-600' : 'text-red-500'}">
+                                ${p.stock > 0 ? `${p.stock} in stock` : 'Out of stock'}
+                            </span>
+                        </div>
+                        <button onclick="addToCart('${p.id}')" ${p.stock <= 0 ? 'disabled' : ''} class="w-full py-2 px-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white font-semibold text-xs rounded-lg transition flex items-center justify-center space-x-1.5 shadow-sm">
+                            <i class="fa-solid fa-cart-plus"></i>
+                            <span>${p.stock > 0 ? 'Add to Cart' : 'Out of Stock'}</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Cart Actions
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product || product.stock <= 0) return;
+
+            const existingItem = cart.find(item => item.id === productId);
+            if (existingItem) {
+                if (existingItem.qty < product.stock) {
+                    existingItem.qty++;
+                    showToast(`Updated ${product.name} quantity`);
+                } else {
+                    showToast(`Cannot add more than available stock (${product.stock})`, 'error');
+                }
+            } else {
+                cart.push({ id: product.id, name: product.name, price: product.price, image: product.image, qty: 1 });
+                showToast(`Added ${product.name} to cart`);
+            }
+
+            updateCartUI();
+        }
+
+        function updateCartUI() {
+            const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+            const badge = document.getElementById('cart-badge');
+            if (totalQty > 0) {
+                badge.textContent = totalQty;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+
+            document.getElementById('cart-total-price').textContent = `$${totalPrice.toFixed(2)}`;
+
+            const list = document.getElementById('cart-items-list');
+            if (cart.length === 0) {
+                list.innerHTML = `
+                    <div class="text-center py-12 text-gray-400">
+                        <i class="fa-solid fa-basket-shopping text-4xl mb-2"></i>
+                        <p class="text-xs">Your shopping cart is empty</p>
+                    </div>
+                `;
+            } else {
+                list.innerHTML = cart.map(item => `
+                    <div class="flex items-center space-x-3 bg-gray-50 p-2.5 rounded-xl border">
+                        <img src="${item.image}" class="w-12 h-12 object-cover rounded-lg border">
+                        <div class="flex-1 min-w-0">
+                            <h4 class="font-bold text-xs text-gray-800 truncate">${item.name}</h4>
+                            <p class="text-xs text-gray-500">$${item.price.toFixed(2)}</p>
+                        </div>
+                        <div class="flex items-center space-x-1">
+                            <button onclick="changeCartQty('${item.id}', -1)" class="w-6 h-6 bg-white border rounded text-xs hover:bg-gray-100">-</button>
+                            <span class="text-xs font-semibold px-1">${item.qty}</span>
+                            <button onclick="changeCartQty('${item.id}', 1)" class="w-6 h-6 bg-white border rounded text-xs hover:bg-gray-100">+</button>
+                        </div>
+                        <button onclick="removeFromCart('${item.id}')" class="text-gray-400 hover:text-red-600 p-1">
+                            <i class="fa-solid fa-trash text-xs"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function changeCartQty(id, delta) {
+            const item = cart.find(i => i.id === id);
+            const prod = products.find(p => p.id === id);
+            if (!item || !prod) return;
+
+            if (delta > 0 && item.qty >= prod.stock) {
+                showToast(`Max stock reached (${prod.stock})`, 'error');
+                return;
+            }
+
+            item.qty += delta;
+            if (item.qty <= 0) {
+                cart = cart.filter(i => i.id !== id);
+            }
+            updateCartUI();
+        }
+
+        function removeFromCart(id) {
+            cart = cart.filter(i => i.id !== id);
+            updateCartUI();
+        }
+
+        function toggleCartDrawer(open) {
+            const drawer = document.getElementById('cart-drawer');
+            if (open) drawer.classList.remove('hidden');
+            else drawer.classList.add('hidden');
+        }
+
+        function openCheckoutModal() {
+            if (cart.length === 0) {
+                showToast('Cart is empty', 'error');
+                return;
+            }
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+            document.getElementById('checkout-total-val').textContent = `$${totalPrice.toFixed(2)}`;
+            toggleCartDrawer(false);
+            document.getElementById('checkout-modal').classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkout-modal').classList.add('hidden');
+        }
+
+        function handleCheckoutSubmit(e) {
+            e.preventDefault();
+            const totalPrice = cart.reduce((sum, item) => sum + (item.price * item.qty), 0);
+
+            const newOrder = {
+                id: 'ORD-' + Math.floor(100000 + Math.random() * 900000),
+                date: new Date().toLocaleDateString() + ' ' + new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
+                customerName: document.getElementById('cust-name').value,
+                phone: document.getElementById('cust-phone').value,
+                email: document.getElementById('cust-email').value,
+                address: document.getElementById('cust-address').value,
+                paymentMethod: document.getElementById('cust-payment').value,
+                items: [...cart],
+                total: totalPrice,
+                status: 'Pending'
+            };
+
+            // Deduct product stock
+            cart.forEach(cartItem => {
+                const prod = products.find(p => p.id === cartItem.id);
+                if (prod) {
+                    prod.stock = Math.max(0, prod.stock - cartItem.qty);
+                }
+            });
+
+            orders.unshift(newOrder);
+            saveProductsToStorage();
+            saveOrdersToStorage();
+
+            cart = [];
+            updateCartUI();
+            closeCheckoutModal();
+            renderProducts();
+
+            showToast('Order placed successfully! Thank you.');
+            openOrderDetailsModal(newOrder.id);
+        }
+
+        // Admin Authentication & Views
+        function handleAdminLogin(e) {
+            e.preventDefault();
+            const user = document.getElementById('login-username').value;
+            const pass = document.getElementById('login-password').value;
+
+            if (user === 'admin' && pass === 'DsL5151#') {
+                isAdminLoggedIn = true;
+                document.getElementById('admin-login-card').classList.add('hidden');
+                document.getElementById('admin-dashboard').classList.remove('hidden');
+                document.getElementById('admin-controls').classList.remove('hidden');
+                document.getElementById('login-error').classList.add('hidden');
+                renderAdminDashboard();
+                showToast('Welcome Admin!');
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        function adminLogout() {
+            isAdminLoggedIn = false;
+            document.getElementById('admin-login-card').classList.remove('hidden');
+            document.getElementById('admin-dashboard').classList.add('hidden');
+            document.getElementById('admin-controls').classList.add('hidden');
+            switchView('store');
+        }
+
+        function switchAdminTab(tab) {
+            if (tab === 'inventory') {
+                document.getElementById('admin-tab-inventory').classList.remove('hidden');
+                document.getElementById('admin-tab-orders').classList.add('hidden');
+                document.getElementById('tab-btn-inventory').className = "px-4 py-2 text-xs font-semibold rounded-lg bg-blue-600 text-white shadow";
+                document.getElementById('tab-btn-orders').className = "px-4 py-2 text-xs font-semibold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200";
+            } else {
+                document.getElementById('admin-tab-inventory').classList.add('hidden');
+                document.getElementById('admin-tab-orders').classList.remove('hidden');
+                document.getElementById('tab-btn-inventory').className = "px-4 py-2 text-xs font-semibold rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200";
+                document.getElementById('tab-btn-orders').className = "px-4 py-2 text-xs font-semibold rounded-lg bg-blue-600 text-white shadow";
+            }
+        }
+
+        function renderAdminDashboard() {
+            // Metrics
+            const totalRev = orders.reduce((sum, o) => sum + o.total, 0);
+            const lowStockCount = products.filter(p => p.stock <= 3).length;
+
+            document.getElementById('metric-revenue').textContent = `$${totalRev.toFixed(2)}`;
+            document.getElementById('metric-orders').textContent = orders.length;
+            document.getElementById('metric-products').textContent = products.length;
+            document.getElementById('metric-lowstock').textContent = lowStockCount;
+
+            // Inventory Table
+            const prodTable = document.getElementById('admin-products-table');
+            prodTable.innerHTML = products.map(p => `
+                <tr class="hover:bg-gray-50">
+                    <td class="py-3 px-4 flex items-center space-x-3">
+                        <img src="${p.image}" class="w-8 h-8 rounded object-cover border">
+                        <span class="font-bold text-gray-800">${p.name}</span>
+                    </td>
+                    <td class="py-3 px-4 text-gray-600">${p.category}</td>
+                    <td class="py-3 px-4 font-semibold text-gray-800">$${p.price.toFixed(2)}</td>
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-0.5 rounded font-semibold text-[10px] ${p.stock <= 3 ? 'bg-amber-100 text-amber-800' : 'bg-emerald-100 text-emerald-800'}">
+                            ${p.stock} units
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 text-right space-x-2">
+                        <button onclick="openProductModal('${p.id}')" class="text-blue-600 hover:underline">Edit</button>
+                        <button onclick="deleteProduct('${p.id}')" class="text-red-600 hover:underline">Delete</button>
+                    </td>
+                </tr>
+            `).join('');
+
+            // Orders Table
+            const ordTable = document.getElementById('admin-orders-table');
+            ordTable.innerHTML = orders.map(o => `
+                <tr class="hover:bg-gray-50">
+                    <td class="py-3 px-4 font-bold text-blue-600">${o.id}</td>
+                    <td class="py-3 px-4">
+                        <div class="font-medium text-gray-800">${o.customerName}</div>
+                        <div class="text-[10px] text-gray-500">${o.phone}</div>
+                    </td>
+                    <td class="py-3 px-4 font-bold text-gray-800">$${o.total.toFixed(2)}</td>
+                    <td class="py-3 px-4 text-gray-600">${o.paymentMethod}</td>
+                    <td class="py-3 px-4">
+                        <select onchange="updateOrderStatus('${o.id}', this.value)" class="text-[11px] bg-white border rounded px-1.5 py-1">
+                            <option value="Pending" ${o.status === 'Pending' ? 'selected' : ''}>Pending</option>
+                            <option value="Processing" ${o.status === 'Processing' ? 'selected' : ''}>Processing</option>
+                            <option value="Shipped" ${o.status === 'Shipped' ? 'selected' : ''}>Shipped</option>
+                            <option value="Completed" ${o.status === 'Completed' ? 'selected' : ''}>Completed</option>
+                            <option value="Cancelled" ${o.status === 'Cancelled' ? 'selected' : ''}>Cancelled</option>
+                        </select>
+                    </td>
+                    <td class="py-3 px-4 text-right">
+                        <button onclick="openOrderDetailsModal('${o.id}')" class="px-2 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-[11px] font-semibold">
+                            View Invoice
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        // Product CRUD Operations
+        function openProductModal(id = null) {
+            const modal = document.getElementById('product-modal');
+            modal.classList.remove('hidden');
+
+            if (id) {
+                const p = products.find(prod => prod.id === id);
+                document.getElementById('product-modal-title').textContent = 'Edit Product';
+                document.getElementById('prod-id').value = p.id;
+                document.getElementById('prod-name').value = p.name;
+                document.getElementById('prod-category').value = p.category;
+                document.getElementById('prod-price').value = p.price;
+                document.getElementById('prod-stock').value = p.stock;
+                document.getElementById('prod-image').value = p.image;
+                document.getElementById('prod-description').value = p.description;
+            } else {
+                document.getElementById('product-modal-title').textContent = 'Add Product';
+                document.getElementById('prod-id').value = '';
+                document.getElementById('prod-name').value = '';
+                document.getElementById('prod-category').value = '';
+                document.getElementById('prod-price').value = '';
+                document.getElementById('prod-stock').value = '';
+                document.getElementById('prod-image').value = '';
+                document.getElementById('prod-description').value = '';
+            }
+        }
+
+        function closeProductModal() {
+            document.getElementById('product-modal').classList.add('hidden');
+        }
+
+        function handleProductFormSubmit(e) {
+            e.preventDefault();
+            const id = document.getElementById('prod-id').value;
+            const name = document.getElementById('prod-name').value;
+            const category = document.getElementById('prod-category').value;
+            const price = parseFloat(document.getElementById('prod-price').value);
+            const stock = parseInt(document.getElementById('prod-stock').value);
+            const image = document.getElementById('prod-image').value;
+            const description = document.getElementById('prod-description').value;
+
+            if (id) {
+                const index = products.findIndex(p => p.id === id);
+                if (index !== -1) {
+                    products[index] = { id, name, category, price, stock, image, description };
+                }
+            } else {
+                const newId = 'prod-' + Date.now();
+                products.push({ id: newId, name, category, price, stock, image, description });
+            }
+
+            saveProductsToStorage();
+            renderCategoryFilters();
+            renderProducts();
+            renderAdminDashboard();
+            closeProductModal();
+            showToast('Product inventory updated!');
+        }
+
+        function deleteProduct(id) {
+            if (confirm('Are you sure you want to remove this product?')) {
+                products = products.filter(p => p.id !== id);
+                saveProductsToStorage();
+                renderCategoryFilters();
+                renderProducts();
+                renderAdminDashboard();
+                showToast('Product removed');
+            }
+        }
+
+        // Order Actions
+        function updateOrderStatus(orderId, newStatus) {
+            const ord = orders.find(o => o.id === orderId);
+            if (ord) {
+                ord.status = newStatus;
+                saveOrdersToStorage();
+                showToast(`Order ${orderId} status set to ${newStatus}`);
+            }
+        }
+
+        function openOrderDetailsModal(orderId) {
+            const ord = orders.find(o => o.id === orderId);
+            if (!ord) return;
+
+            document.getElementById('inv-order-id').textContent = ord.id;
+            document.getElementById('inv-order-date').textContent = 'Date: ' + ord.date;
+            document.getElementById('inv-cust-name').textContent = ord.customerName;
+            document.getElementById('inv-cust-phone').textContent = 'Tel: ' + ord.phone;
+            document.getElementById('inv-cust-email').textContent = 'Email: ' + ord.email;
+            document.getElementById('inv-cust-address').textContent = 'Address: ' + ord.address;
+            document.getElementById('inv-payment-method').textContent = 'Payment: ' + ord.paymentMethod;
+            document.getElementById('inv-total-amount').textContent = `$${ord.total.toFixed(2)}`;
+
+            const table = document.getElementById('inv-items-table');
+            table.innerHTML = ord.items.map(item => `
+                <tr>
+                    <td class="py-2">${item.name}</td>
+                    <td class="py-2 text-center">${item.qty}</td>
+                    <td class="py-2 text-right">$${item.price.toFixed(2)}</td>
+                    <td class="py-2 text-right">$${(item.price * item.qty).toFixed(2)}</td>
+                </tr>
+            `).join('');
+
+            document.getElementById('order-details-modal').classList.remove('hidden');
+        }
+
+        function closeOrderModal() {
+            document.getElementById('order-details-modal').classList.add('hidden');
+        }
+
+        // Export / Import Helpers
+        function downloadFile(content, fileName, contentType) {
+            const a = document.createElement('a');
+            const file = new Blob([content], { type: contentType });
+            a.href = URL.createObjectURL(file);
+            a.download = fileName;
+            a.click();
+        }
+
+        function exportProducts(format) {
+            if (format === 'json') {
+                downloadFile(JSON.stringify(products, null, 2), 'ns_products.json', 'application/json');
+            } else if (format === 'csv') {
+                const headers = ['id', 'name', 'category', 'price', 'stock', 'description', 'image'];
+                const rows = products.map(p => [
+                    `"${p.id}"`, `"${p.name.replace(/"/g, '""')}"`, `"${p.category}"`, p.price, p.stock, `"${(p.description||'').replace(/"/g, '""')}"`, `"${p.image}"`
+                ]);
+                const csvStr = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+                downloadFile(csvStr, 'ns_products.csv', 'text/csv');
+            }
+        }
+
+        function exportOrders(format) {
+            if (format === 'json') {
+                downloadFile(JSON.stringify(orders, null, 2), 'ns_orders.json', 'application/json');
+            } else if (format === 'csv') {
+                const headers = ['id', 'date', 'customerName', 'phone', 'email', 'total', 'paymentMethod', 'status'];
+                const rows = orders.map(o => [
+                    `"${o.id}"`, `"${o.date}"`, `"${o.customerName.replace(/"/g, '""')}"`, `"${o.phone}"`, `"${o.email}"`, o.total, `"${o.paymentMethod}"`, `"${o.status}"`
+                ]);
+                const csvStr = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+                downloadFile(csvStr, 'ns_orders.csv', 'text/csv');
+            }
+        }
+
+        function importProducts(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const text = e.target.result;
+                    if (file.name.endsWith('.json')) {
+                        const imported = JSON.parse(text);
+                        if (Array.isArray(imported)) {
+                            products = imported;
+                            saveProductsToStorage();
+                            renderCategoryFilters();
+                            renderProducts();
+                            renderAdminDashboard();
+                            showToast('Products imported successfully!');
+                        }
+                    } else if (file.name.endsWith('.csv')) {
+                        const lines = text.split('\n').filter(l => l.trim() !== '');
+                        const newProducts = [];
+                        for (let i = 1; i < lines.length; i++) {
+                            const cols = lines[i].split(',').map(c => c.replace(/^"|"$/g, '').trim());
+                            if (cols.length >= 5) {
+                                newProducts.push({
+                                    id: cols[0] || ('prod-' + Date.now() + i),
+                                    name: cols[1],
+                                    category: cols[2],
+                                    price: parseFloat(cols[3]) || 0,
+                                    stock: parseInt(cols[4]) || 0,
+                                    description: cols[5] || '',
+                                    image: cols[6] || 'https://images.unsplash.com/photo-1526738549149-8e07eca6c147?auto=format&fit=crop&w=600&q=80'
+                                });
+                            }
+                        }
+                        if (newProducts.length > 0) {
+                            products = newProducts;
+                            saveProductsToStorage();
+                            renderCategoryFilters();
+                            renderProducts();
+                            renderAdminDashboard();
+                            showToast('CSV Products imported successfully!');
+                        }
+                    }
+                } catch (err) {
+                    showToast('Failed to parse import file', 'error');
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // Notification Toast
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const icon = document.getElementById('toast-icon');
+            const msg = document.getElementById('toast-message');
+
+            msg.textContent = message;
+            if (type === 'error') {
+                icon.className = 'fa-solid fa-circle-exclamation text-red-400';
+            } else {
+                icon.className = 'fa-solid fa-circle-check text-emerald-400';
+            }
+
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
