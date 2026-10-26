@@ -244,9 +244,7 @@ export default function App() {
         searchQuery={searchQuery}
         setSearchQuery={setSearchQuery}
         settings={settings}
-        isCloudConnected={isCloudConnected}
         isAdminLoggedIn={isAdminLoggedIn}
-        onOpenDeployGuide={() => setIsDeployGuideOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -259,8 +257,6 @@ export default function App() {
               onExploreClick={() => {
                 document.getElementById('product-catalog')?.scrollIntoView({ behavior: 'smooth' });
               }}
-              isCloudConnected={isCloudConnected}
-              onOpenDeployGuide={() => setIsDeployGuideOpen(true)}
             />
 
             {/* Catalog Grid Section */}
@@ -459,7 +455,6 @@ export default function App() {
           setCurrentView('store');
           window.scrollTo({ top: 300, behavior: 'smooth' });
         }}
-        onOpenDeployGuide={() => setIsDeployGuideOpen(true)}
         onSwitchToAdmin={() => setCurrentView('admin')}
       />
 

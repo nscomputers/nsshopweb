@@ -14,15 +14,11 @@ import { StoreSettings } from '../types';
 interface HeroBannerProps {
   settings: StoreSettings;
   onExploreClick: () => void;
-  isCloudConnected: boolean;
-  onOpenDeployGuide: () => void;
 }
 
 export const HeroBanner: React.FC<HeroBannerProps> = ({
   settings,
-  onExploreClick,
-  isCloudConnected,
-  onOpenDeployGuide
+  onExploreClick
 }) => {
   const cleanPhone = settings.phone.replace(/[^0-9]/g, '');
   // Format for Sri Lanka international WhatsApp if starts with 07: e.g. 0717592590 -> 94717592590
@@ -38,18 +34,14 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
 
         <div className="relative z-10 max-w-2xl">
           <div className="flex flex-wrap items-center gap-2 mb-4">
-            <span className="inline-flex items-center gap-1 px-3 py-1 bg-blue-500/20 text-blue-300 text-xs font-semibold rounded-full border border-blue-400/30">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-500/20 text-blue-300 text-xs font-semibold rounded-full border border-blue-400/30">
               <Zap className="w-3.5 h-3.5 text-blue-400" />
               Official Computer & Electronics Store
             </span>
-            <button
-              onClick={onOpenDeployGuide}
-              className="inline-flex items-center gap-1 px-3 py-1 bg-white/10 hover:bg-white/20 text-slate-200 text-xs font-medium rounded-full border border-white/15 transition cursor-pointer"
-            >
-              <span className={`w-2 h-2 rounded-full ${isCloudConnected ? 'bg-emerald-400' : 'bg-amber-400'}`}></span>
-              <span>{isCloudConnected ? 'Cloud Sync Active' : 'Permanent Save & GitHub Pages Ready'}</span>
-              <ArrowRight className="w-3 h-3 text-slate-400" />
-            </button>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-emerald-500/20 text-emerald-300 text-xs font-semibold rounded-full border border-emerald-400/30">
+              <Truck className="w-3.5 h-3.5 text-emerald-400" />
+              Islandwide Delivery
+            </span>
           </div>
 
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-tight text-white mb-3">
@@ -84,7 +76,7 @@ export const HeroBanner: React.FC<HeroBannerProps> = ({
               onClick={onExploreClick}
               className="inline-flex items-center gap-2 px-4 py-3 bg-slate-800/80 hover:bg-slate-800 text-slate-200 hover:text-white font-medium text-sm rounded-xl border border-slate-700 transition backdrop-blur-sm"
             >
-              <span>Explore Catalog</span>
+              <span>Explore Products</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
